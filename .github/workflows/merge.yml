@@ -1,0 +1,31 @@
+name: Merge
+on:
+  pull_request:
+    paths: ["Formula/**.rb"]
+
+concurrency: ${{ github.workflow }}
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  merge:
+    if: ${{ github.actor == 'pr-writer-for-tmknom[bot]'}}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: tmknom/checkout-action@v1
+
+      - name: Merge
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -x
+          gh pr merge "${GITHUB_HEAD_REF}" --merge
